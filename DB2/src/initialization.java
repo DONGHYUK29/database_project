@@ -106,7 +106,7 @@ public class initialization {
                     + "FOREIGN KEY (reservation_number) REFERENCES reservations(reservation_number))";
             stmt.executeUpdate(createTicketsTable);
 
-            System.out.println("Tables created successfully!");
+            System.out.println("Tables created");
             
             
             
@@ -555,6 +555,8 @@ public class initialization {
                     + "(11, 6, 3, 11, 11, 1, 11000, 11000),"
                     + "(12, 6, 3, 12, 12, 1, 11000, 12000)";
             stmt.executeUpdate(insertTicketsData);
+            
+            System.out.println("Data inserted.");
             
         } catch (ClassNotFoundException e) {
             System.out.println("JDBC driver load error");

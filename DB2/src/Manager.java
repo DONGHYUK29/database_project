@@ -9,6 +9,7 @@ public class Manager extends JFrame {
 
     private JTable table;
     private JScrollPane scrollPane;
+    private JPanel panel;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -26,14 +27,13 @@ public class Manager extends JFrame {
         setSize(800, 400);
         setLocationRelativeTo(null); // 프레임을 화면 중앙에 배치
 
-        JPanel panel = new JPanel();
-        JLabel titleLabel = new JLabel("Choose your action");
+        panel = new JPanel();
 
         JButton showTableButton = new JButton("전체 테이블 보기");
         showTableButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showTableData();
+                showTable();
             }
         });
 
@@ -57,7 +57,7 @@ public class Manager extends JFrame {
         addTheaterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	addscheduledata();
+            	addtheaterdata();
             	}
         });
 
@@ -68,8 +68,7 @@ public class Manager extends JFrame {
             	addseatsdata();
             	}
         });
-
-        panel.add(titleLabel);
+        
         panel.add(showTableButton);
         panel.add(addMovieButton);
         panel.add(addScheduleButton);
@@ -84,11 +83,68 @@ public class Manager extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    private void showTableData() {
+    private void showTable() {
         try {
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db1?serverTimezone=UTC", "root", "1234");
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("show tables");
+            ResultSet rs = stmt.executeQuery("SHOW TABLES");
+
+            DefaultTableModel model = new DefaultTableModel();
+            model.addColumn("Table Name");
+
+            while (rs.next()) {
+                model.addRow(new Object[]{rs.getString(1)});
+            }
+
+            table.setModel(model);
+
+            rs.close();
+            stmt.close();
+            conn.close();
+
+            JPanel buttonPanel = new JPanel();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                String tablename = (String)model.getValueAt(i, 0);
+                JButton tableButton = new JButton(tablename + " Table");
+                tableButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        showTableMoviesData(tablename);
+                    }
+                });
+                buttonPanel.add(tableButton);
+            }
+
+            add(buttonPanel, BorderLayout.SOUTH);
+            revalidate();
+            repaint();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    private void addmoviedata() {
+    	
+    }
+    
+    private void addscheduledata() {
+    	
+    }
+    
+	private void addtheaterdata() {
+		
+	}
+    
+    private void addseatsdata() {
+    	
+    }
+    
+    private void showTableMoviesData(String tablename) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db1?serverTimezone=UTC", "root", "1234");
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM " + tablename);
 
             // Populate table model with data from ResultSet
             ResultSetMetaData metaData = rs.getMetaData();
@@ -115,21 +171,5 @@ public class Manager extends JFrame {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-    
-    private void addmoviedata() {
-    	
-    }
-    
-    private void addscheduledata() {
-    	
-    }
-    
-	private void addtheaterdata() {
-		
-	}
-    
-    private void addseatsdata() {
-    	
     }
 }
